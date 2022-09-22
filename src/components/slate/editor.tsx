@@ -1,202 +1,85 @@
-import clsx from 'clsx'
-import * as React from 'react'
-import { Bold, Italic, Underline } from 'react-feather'
-import {
-  BaseEditor,
-  createEditor,
-  Descendant,
-  Editor as SlateEditor,
-  Range,
-  Text,
-  Transforms
-} from 'slate'
-import { HistoryEditor, withHistory } from 'slate-history'
-import {
-  Editable,
-  ReactEditor,
-  RenderLeafProps,
-  Slate,
-  useFocused,
-  useSlate,
-  withReact
-} from 'slate-react'
+import { isHotkey } from 'is-hotkey'
+import { Editor as SlateEditor, Range } from 'slate'
+import { Editable, Slate } from 'slate-react'
 
-import { Portal } from '../primitives/portal'
-
-type TSlateEditor = BaseEditor & ReactEditor & HistoryEditor
+import { RenderElement } from './element'
+import { HOTKEYS } from './hotkeys'
+import { RenderLeaf } from './leaf'
+import { Toolbar } from './toolbar'
+import { BlockType, CustomElement } from './types'
+import { useEditor } from './use-editor'
+import { toggleMark } from './utils'
 
 export const Editor = () => {
-  const editor: TSlateEditor = React.useMemo(
-    () => withHistory(withReact(createEditor())),
-    []
-  )
-
-  const handleOnDOMBeforeInput = React.useCallback(
-    (event: InputEvent) => {
-      switch (event.inputType) {
-        case 'formatBold':
-          event.preventDefault()
-          return toggleFormat(editor, 'bold')
-        case 'formatItalic':
-          event.preventDefault()
-          return toggleFormat(editor, 'italic')
-        case 'formatUnderline':
-          event.preventDefault()
-          return toggleFormat(editor, 'underlined')
-      }
-    },
-    [editor]
-  )
+  const editor = useEditor()
 
   return (
-    <>
-      <h1>My Document</h1>
+    <div>
       <Slate editor={editor} value={initialValue}>
-        <HoveringToolbar />
+        <Toolbar />
         <Editable
-          renderLeaf={Leaf}
+          className="prose dark:prose-invert"
+          renderElement={RenderElement}
+          renderLeaf={RenderLeaf}
           placeholder="Enter some text..."
-          onDOMBeforeInput={handleOnDOMBeforeInput}
+          /**
+           * Inspired by this great article from https://twitter.com/_jkrsp
+           * https://jkrsp.com/slate-js-placeholder-per-line/
+           **/
+          decorate={([node, path]) => {
+            if (editor.selection != null) {
+              if (
+                !SlateEditor.isEditor(node) &&
+                SlateEditor.string(editor, [path[0] ?? 0]) === '' &&
+                Range.includes(editor.selection, path) &&
+                Range.isCollapsed(editor.selection)
+              ) {
+                return [
+                  {
+                    ...editor.selection,
+                    placeholder: 'Type something here…'
+                  }
+                ]
+              }
+            }
+
+            return []
+          }}
+          onKeyDown={(event) => {
+            for (const hotkey in HOTKEYS) {
+              if (isHotkey(hotkey, event) && editor.selection) {
+                event.preventDefault()
+                const mark = HOTKEYS[hotkey]
+                if (!mark) return
+                toggleMark(editor, mark)
+              }
+            }
+          }}
         />
       </Slate>
-    </>
+    </div>
   )
 }
 
-const toggleFormat = (editor: BaseEditor, format: string) => {
-  const isActive = isFormatActive(editor, format)
-  Transforms.setNodes(
-    editor,
-    { [format]: isActive ? null : true },
-    { match: Text.isText, split: true }
-  )
-}
-
-const isFormatActive = (editor: BaseEditor, format: string) => {
-  const [match] = SlateEditor.nodes(editor, {
-    // @ts-ignore
-    match: (n) => n[format] === true,
-    mode: 'all'
-  })
-  return !!match
-}
-
-const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
-  // @ts-ignore
-  if (leaf.bold) {
-    children = <strong>{children}</strong>
-  }
-
-  // @ts-ignore
-  if (leaf.italic) {
-    children = <em>{children}</em>
-  }
-
-  // @ts-ignore
-  if (leaf.underlined) {
-    children = <u>{children}</u>
-  }
-
-  return <span {...attributes}>{children}</span>
-}
-
-const HoveringToolbar = () => {
-  const ref = React.useRef<HTMLDivElement>(null)
-  const editor = useSlate()
-  const inFocus = useFocused()
-
-  React.useEffect(() => {
-    const el = ref.current
-    const { selection } = editor
-
-    if (!el) {
-      return
-    }
-
-    if (
-      !selection ||
-      !inFocus ||
-      Range.isCollapsed(selection) ||
-      SlateEditor.string(editor, selection) === ''
-    ) {
-      el.removeAttribute('style')
-      return
-    }
-
-    const domSelection = window.getSelection()
-    if (!domSelection) return
-    const domRange = domSelection.getRangeAt(0)
-    const rect = domRange.getBoundingClientRect()
-    el.style.opacity = '1'
-    el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`
-    el.style.left = `${
-      rect.left + window.pageXOffset - el.offsetWidth / 2 + rect.width / 2
-    }px`
-
-    return () => {
-      el.removeAttribute('style')
-    }
-  })
-
-  return (
-    <Portal id="editor-toolbar" className="relative">
-      <div
-        className="absolute z-10 bg-gray-900 -top-full -left-full -mt-2 opacity-0 border border-gray-500 shadow-md rounded transition-all"
-        ref={ref}
-        onMouseDown={(e) => {
-          // prevent toolbar from taking focus away from editor
-          e.preventDefault()
-        }}
-      >
-        <FormatButton format="bold" />
-        <FormatButton format="italic" />
-        <FormatButton format="underlined" />
-      </div>
-    </Portal>
-  )
-}
-
-const FormatButton = ({ format }: { format: string }) => {
-  const editor = useSlate()
-  const isActive = isFormatActive(editor, format)
-  const icon = React.useMemo(() => {
-    return {
-      bold: <Bold />,
-      italic: <Italic />,
-      underlined: <Underline />
-    }[format]
-  }, [format])
-
-  return (
-    <button
-      className={clsx(isActive && 'bg-gray-700 color-gray-50')}
-      onClick={() => toggleFormat(editor, format)}
-    >
-      <span>{icon}</span>
-    </button>
-  )
-}
-
-const initialValue: Descendant[] = [
+const initialValue: CustomElement[] = [
   {
-    type: 'paragraph',
+    id: 'sarasa',
+    type: BlockType.Paragraph,
     children: [
       {
         text: 'This example shows how you can make a hovering menu appear above your content, which you can use to make text '
       },
-      // @ts-ignore
       { text: 'bold', bold: true },
       { text: ', ' },
-      // @ts-ignore
       { text: 'italic', italic: true },
       { text: ', or anything else you might want to do!' }
     ]
   },
   {
-    type: 'paragraph',
+    id: 'sarasa2',
+    type: BlockType.Paragraph,
     children: [
       { text: 'Try it out yourself! Just ' },
-      // @ts-ignore
       { text: 'select any piece of text and the menu will appear', bold: true },
       { text: '.' }
     ]

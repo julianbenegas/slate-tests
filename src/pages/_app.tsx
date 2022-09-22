@@ -1,5 +1,6 @@
 import '~/css/global.scss'
 
+import { TooltipProvider } from '@radix-ui/react-tooltip'
 import type { NextComponentType, NextPageContext } from 'next'
 import type { AppProps } from 'next/app'
 import * as React from 'react'
@@ -101,7 +102,9 @@ const App = ({ Component, pageProps, ...rest }: AppProps) => {
   return (
     <>
       {gaTrackingId && <GAScripts />}
-      {getLayout({ Component, pageProps, ...rest })}
+      <TooltipProvider>
+        {getLayout({ Component, pageProps, ...rest })}
+      </TooltipProvider>
     </>
   )
 }

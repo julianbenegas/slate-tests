@@ -7,7 +7,10 @@ const HomePage = () => {
     <PageLayout>
       <Meta />
 
-      <Editor />
+      <div className="max-w-3xl mx-auto px-16 py-16">
+        <h1 className="mb-4 text-4xl font-bold">My Document</h1>
+        <Editor />
+      </div>
     </PageLayout>
   )
 }
