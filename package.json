@@ -37,6 +37,7 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^12.2.5",
     "@next/eslint-plugin-next": "^12.2.5",
+    "@radix-ui/colors": "^0.1.8",
     "@tailwindcss/typography": "^0.5.7",
     "@types/css-font-loading-module": "0.0.7",
     "@types/mousetrap": "1.6.9",

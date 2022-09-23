@@ -1,0 +1,88 @@
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 300;
+  font-display: block;
+  font-style: normal;
+  src: url('/fonts/untitled-sans/test-untitled-sans-light.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 300;
+  font-display: block;
+  font-style: italic;
+  src: url('/fonts/untitled-sans/test-untitled-sans-light-italic.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 400;
+  font-display: block;
+  font-style: normal;
+  src: url('/fonts/untitled-sans/test-untitled-sans-regular.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 400;
+  font-display: block;
+  font-style: italic;
+  src: url('/fonts/untitled-sans/test-untitled-sans-regular-italic.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 500;
+  font-display: block;
+  font-style: normal;
+  src: url('/fonts/untitled-sans/test-untitled-sans-medium.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 500;
+  font-display: block;
+  font-style: italic;
+  src: url('/fonts/untitled-sans/test-untitled-sans-medium-italic.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 700;
+  font-display: block;
+  font-style: normal;
+  src: url('/fonts/untitled-sans/test-untitled-sans-bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 700;
+  font-display: block;
+  font-style: italic;
+  src: url('/fonts/untitled-sans/test-untitled-sans-bold-italic.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 900;
+  font-display: block;
+  font-style: normal;
+  src: url('/fonts/untitled-sans/test-untitled-sans-black.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Untitled Sans';
+  font-weight: 900;
+  font-display: block;
+  font-style: italic;
+  src: url('/fonts/untitled-sans/test-untitled-sans-black-italic.woff2')
+    format('woff2');
+}

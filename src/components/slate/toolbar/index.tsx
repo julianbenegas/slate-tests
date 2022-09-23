@@ -84,7 +84,7 @@ export function Toolbar() {
     <Portal id="toolbar-portal">
       <ToolbarPrimitive.Root
         ref={ref}
-        className=""
+        className="opacity-0 absolute space-x-1 -translate-y-12 bg-dark-gray12/70 backdrop-blur-sm p-1 rounded-md shadow-lg"
         onMouseDown={(e) => {
           // prevent toolbar from taking focus away from editor
           e.preventDefault()
@@ -98,7 +98,10 @@ export function Toolbar() {
                 value={option.value}
                 aria-label={option.title}
                 onPointerDown={(e) => e.preventDefault()}
-                className={clsx(isActive && 'bg-red-500')}
+                className={clsx(
+                  isActive && 'bg-dark-gray9',
+                  'p-2 cursor-default rounded-md text-dark-gray1'
+                )}
                 onClick={(e) => {
                   toggleMark(editor, option.value)
                   e.stopPropagation()
