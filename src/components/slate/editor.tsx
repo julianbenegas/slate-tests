@@ -1,14 +1,13 @@
-import { isHotkey } from 'is-hotkey'
 import { Editor as SlateEditor, Range } from 'slate'
 import { Editable, Slate } from 'slate-react'
 
+import { BlockMenu } from './block-menu'
 import { RenderElement } from './element'
-import { HOTKEYS } from './hotkeys'
+import { handleHotkeysOnKeyDown } from './hotkeys'
 import { RenderLeaf } from './leaf'
 import { Toolbar } from './toolbar'
 import { BlockType, CustomElement } from './types'
 import { useEditor } from './use-editor'
-import { toggleMark } from './utils'
 
 export const Editor = () => {
   const editor = useEditor()
@@ -17,11 +16,11 @@ export const Editor = () => {
     <div>
       <Slate editor={editor} value={initialValue}>
         <Toolbar />
+        <BlockMenu />
         <Editable
           className="prose dark:prose-invert"
           renderElement={RenderElement}
           renderLeaf={RenderLeaf}
-          placeholder="Enter some text..."
           /**
            * Inspired by this great article from https://twitter.com/_jkrsp
            * https://jkrsp.com/slate-js-placeholder-per-line/
@@ -46,14 +45,7 @@ export const Editor = () => {
             return []
           }}
           onKeyDown={(event) => {
-            for (const hotkey in HOTKEYS) {
-              if (isHotkey(hotkey, event) && editor.selection) {
-                event.preventDefault()
-                const mark = HOTKEYS[hotkey]
-                if (!mark) return
-                toggleMark(editor, mark)
-              }
-            }
+            handleHotkeysOnKeyDown(event, editor)
           }}
         />
       </Slate>
@@ -65,23 +57,6 @@ const initialValue: CustomElement[] = [
   {
     id: 'sarasa',
     type: BlockType.Paragraph,
-    children: [
-      {
-        text: 'This example shows how you can make a hovering menu appear above your content, which you can use to make text '
-      },
-      { text: 'bold', bold: true },
-      { text: ', ' },
-      { text: 'italic', italic: true },
-      { text: ', or anything else you might want to do!' }
-    ]
-  },
-  {
-    id: 'sarasa2',
-    type: BlockType.Paragraph,
-    children: [
-      { text: 'Try it out yourself! Just ' },
-      { text: 'select any piece of text and the menu will appear', bold: true },
-      { text: '.' }
-    ]
+    children: [{ text: '' }]
   }
 ]

@@ -4,14 +4,16 @@ import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
 
 import { CreateNewBlockFromBlock } from './element/block'
+import { withShortcuts } from './shortcuts'
 import { BlockType, CustomElement } from './types'
-import { makeNodeId, withNodeId, withShortcuts } from './utils'
+import { makeNodeId, withNodeId } from './utils'
 
 export const useEditor = () => {
   const editor = React.useMemo(
     () => withShortcuts(withNodeId(withHistory(withReact(createEditor())))),
     []
   )
+
   React.useEffect(() => {
     const { insertBreak } = editor
     // Override editor to insert paragraph or element after inserting new line
